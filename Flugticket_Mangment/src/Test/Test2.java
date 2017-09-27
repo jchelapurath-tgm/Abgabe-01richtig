@@ -18,6 +18,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JButton;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.JScrollPane;
 
 public class Test2 {
 
@@ -26,6 +27,7 @@ public class Test2 {
 	private JFrame frame;
 	private JTextField textField;
 	private JTextField textField_1;
+	private JScrollPane scrollPane;
 	private JTable table;
 
 	/**
@@ -64,18 +66,27 @@ public class Test2 {
 	 */
 	public Test2() {
 		initialize();
-		for(int i = 0; i < flughafen.size();i++) {
-			DefaultTableModel model = (DefaultTableModel) table.getModel();
-			Object[] row = new Object[3];
-			for (int ir = 0; ir < flughafen.size();ir++) {
-				row[0] = flughafen.get(ir).getStadt();
-				row[1] = flughafen.get(ir).getLand();
-				row[2] = flughafen.get(ir).getAirportcode();
-				
-				model.addRow(row);
-			}
+
 		}
-	}
+	
+    public void findUsers()
+    {
+        ArrayList<> users = ListUsers(jText_Search.getText());
+        DefaultTableModel model = new DefaultTableModel();
+        model.setColumnIdentifiers(new Object[]{"ID","Fname","Lname","Age"});
+        Object[] row = new Object[4];
+        
+        for(int i = 0; i < users.size(); i++)
+        {
+            row[0] = users.get(i).getId();
+            row[1] = users.get(i).getFname();
+            row[2] = users.get(i).getLname();
+            row[3] = users.get(i).getAge();
+            model.addRow(row);
+        }
+       jTable_Users.setModel(model);
+       
+    }
 
 	/**
 	 * Initialize the contents of the frame.
@@ -99,11 +110,11 @@ public class Test2 {
 		
 		JButton Suchenbutton = new JButton("Suchen");
 		
-		table = new JTable();
+		scrollPane = new JScrollPane();
 		
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
+			groupLayout.createParallelGroup(Alignment.TRAILING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addGap(187)
 					.addComponent(lblAbflug, GroupLayout.PREFERRED_SIZE, 169, GroupLayout.PREFERRED_SIZE)
@@ -120,10 +131,10 @@ public class Test2 {
 					.addGap(407)
 					.addComponent(Suchenbutton, GroupLayout.PREFERRED_SIZE, 173, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap(415, Short.MAX_VALUE))
-				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
-					.addContainerGap(296, Short.MAX_VALUE)
-					.addComponent(table, GroupLayout.PREFERRED_SIZE, 382, GroupLayout.PREFERRED_SIZE)
-					.addGap(317))
+				.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
+					.addGap(110)
+					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 765, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(120, Short.MAX_VALUE))
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
@@ -141,10 +152,24 @@ public class Test2 {
 						.addComponent(textField_1, GroupLayout.PREFERRED_SIZE, 45, GroupLayout.PREFERRED_SIZE))
 					.addGap(35)
 					.addComponent(Suchenbutton, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
-					.addGap(99)
-					.addComponent(table, GroupLayout.PREFERRED_SIZE, 277, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(301, Short.MAX_VALUE))
+					.addGap(15)
+					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 624, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(38, Short.MAX_VALUE))
 		);
+		
+		table = new JTable();
+		table.setModel(new DefaultTableModel(
+			new Object[][] {
+			},
+			new String[] {
+				"Abflug", "Ablfug", "Irgendwas", "Ankunft"
+			}
+		));
+		table.getColumnModel().getColumn(0).setPreferredWidth(103);
+		table.getColumnModel().getColumn(1).setPreferredWidth(210);
+		table.getColumnModel().getColumn(2).setPreferredWidth(102);
+		table.getColumnModel().getColumn(3).setPreferredWidth(243);
+		scrollPane.setViewportView(table);
 		frame.getContentPane().setLayout(groupLayout);
 	}
 }
