@@ -1,10 +1,9 @@
 <?php
 
-$servername = "localhost";
-$username = $_POST['user'];
-$password = $_POST['pw'];
-$db = $_POST['db'];
-$srv = $_POST['srv']; //Bsp Localhost
+$servername = 'localhost';
+$username = 'test';
+$password = '1234';
+$db = 'flugdaten';
 try {
    $conn = new PDO("mysql:host=$servername;dbname=$db", $username, $password);
    // set the PDO error mode to exception
@@ -14,5 +13,5 @@ catch(PDOException $e)
    {
    echo "Connection failed: " . $e->getMessage();
    }
-  $conn = null;
+
 ?>
