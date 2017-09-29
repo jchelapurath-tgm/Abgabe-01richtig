@@ -14,7 +14,6 @@ public class Test {
 
 			Statement myStat = myConn.createStatement();
 			ResultSet myRs = myStat.executeQuery("select * from airports");
-			
 			while(myRs.next()){
 				flughafen.add(new Flughafen(myRs.getString("country"), myRs.getString("city"), myRs.getString("airportcode"), myRs.getString("name")));
 			}

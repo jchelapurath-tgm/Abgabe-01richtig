@@ -6,12 +6,22 @@ public class Flughafen {
 	String Stadt;
 	String	airportcode;
 	String name;
+	String FlullLand;
 	
-	public Flughafen(String Land, String Stadt, String airportcode,String name) {
+	public String getFlullLand() {
+		return FlullLand;
+	}
+
+	public void setFlullLand(String flullLand) {
+		FlullLand = flullLand;
+	}
+
+	public Flughafen(String Land, String Stadt, String airportcode,String name, String FullLand) {
 		this.Land = Land;
 		this.Stadt = Stadt;
 		this.airportcode = airportcode;
 		this.name = name;
+		this.FlullLand = FullLand;
 	}
 
 	public String getLand() {
