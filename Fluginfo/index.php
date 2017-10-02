@@ -1,9 +1,7 @@
 <?php
+require("connect.php");
 
-$servername = 'localhost';
-$username = 'test';
-$password = '1234';
-$db = 'flugdaten';
+
 
 try {
    $conn = new PDO("mysql:host=$servername;dbname=$db", $username, $password);
@@ -26,63 +24,7 @@ catch(PDOException $e)
   </head>
   <body>
 
-<!--
-    <div class="container" style='margin-top: 15px'>
-      <div class="row text-center">
-        <div class="col-sm-12">
-          <h2>Schritt 1: Datenbankdaten</h2>
-          <hr>
-        </div>
-      </div>
 
-<form action="" method="post">
-        <div class="row">
-          <div class="col-sm-6 text-right">
-            Datenbankserver:&nbsp;
-          </div>
-          <div class="col-sm-6">
-            <select name="srv">
-              <option value="localhost">Localhost</option>
-              <option value="MySQL">MySQL</option>
-              <option value="PostGres">PostgreSQL</option>
-            </select>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-sm-6 text-right">
-            Datenbank:&nbsp;
-          </div>
-          <div class="col-sm-6">
-            <input type="text" name="db"value="Flugdaten" required>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-sm-6 text-right">
-            Username:&nbsp;
-          </div>
-          <div class="col-sm-6">
-            <input type="text" name="user" value="test" required>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-sm-6 text-right">
-            Password:&nbsp;
-          </div>
-          <div class="col-sm-6">
-            <input type="password" name="pw" value="1234" required>
-          </div>
-        </div>
-        <br>
-        <div class="row text-center">
-          <div class="col-sm-12">
-            <input type="submit" value="Verbinden">
-            <input type='hidden' value='1' name='dataVerbindung' />
-          </div>
-        </div>
-
-    </div>
-</form>
--->
 <form action="<?=$_SERVER['PHP_SELF']?>" method="post">
     <div class='container'style='margin-top: 25px'>
      <div class='row text-center'>
@@ -92,8 +34,18 @@ catch(PDOException $e)
        </div>
      </div>
        <div class='row'>
-         <div class='col-sm-6 text-right'>Bitte geben Sie eine Flugnummer ein: &nbsp;</div>
-         <div class='col-sm-6'><input type='number' name='flugnr'></div>
+         <div class='col-sm-6 text-right'>Bitte wählen Sie Ihre Flugnummer aus: &nbsp;</div>
+         <div class='col-sm-6'>
+           <select name='flugnr'>
+             <option value="" default>---</option>
+             <?php
+             $sql = "SELECT DISTINCT flightnr FROM flights ORDER BY 1";
+             foreach($conn->query($sql) as $row) {
+               echo "<option>" . $row['flightnr'] . "</option>";
+             }
+             ?>
+           </select>
+         </div>
        </div>
        <br>
        <div class='row text-center'>
@@ -119,41 +71,34 @@ catch(PDOException $e)
 
 <?php
 
-/*
-$conn = null;
-
-if( isset($_POST['dataVerbindung'])){
-$servername = "localhost";
-$username = $_POST['user'];
-$password = $_POST['pw'];
-$db = $_POST['db'];
-$srv = $_POST['srv']; //Bsp Localhost
-global $conn;
-try {
-   $conn = new PDO("mysql:host=$servername;dbname=$db", $username, $password);
-   // set the PDO error mode to exception
-   $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-   }
-catch(PDOException $e)
-   {
-   echo "Connection failed: " . $e->getMessage();
-   }
-}
-*/
 if(isset($_POST['flug'])){
   global $conn;
    $flightnr = $_POST['flugnr'];
    $sql = "SELECT * FROM flights WHERE flightnr = $flightnr";
+   echo "<div class='row'><div class='col-sm-2'>Airline</div><div class='col-sm-2'>Abflugszeit</div><div class='col-sm-2'>Abflugsflughafen</div><div class='col-sm-2'>Ankunftszeit</div><div class='col-sm-2'>Ankunftsflughafen</div><div class='col-sm-2'>Flugzeugart</div></div><br>";
    foreach($conn->query($sql) as $row) {
-     echo "<div class='row'><div class='col-sm-2'>Airline</div><div class='col-sm-2'>Abflugszeit</div><div class='col-sm-2'>Abflugsflughafen</div><div class='col-sm-2'>Ankunftszeit</div><div class='col-sm-2'>Ankunftsflughafen</div><div class='col-sm-2'>Flugzeugart</div></div><br>";
      echo "<div class='row'><div class='col-sm-2' style='border-right:1px solid black'>". $row['airline'] ."</div><div class='col-sm-2' style='border-right:1px solid black'>". $row['departure_time'] ."</div><div class='col-sm-2' style='border-right:1px solid black'>". $row['departure_airport'] ."</div><div class='col-sm-2' style='border-right:1px solid black'>". $row['destination_time'] ."</div><div class='col-sm-2' style='border-right:1px solid black'>". $row['destination_airport'] ."</div><div class='col-sm-2'>". $row['planetype'] ."</div></div>";
    }
    echo "</div>";
 }
-   //$conn = null;
-
-
 ?>
-    </div>
+<div class='container text-center'style='margin-top: 25px'>
+ <div class='row text-center'>
+   <div class='col-sm-12'>
+     <h2>Personen auf diesem Flug</h2>
+     <hr>
+   </div>
+ </div>
+   <?php
+     $sql = "SELECT * FROM passengers WHERE flightnr = $flightnr ORDER BY 6,7";
+     echo "<div class='row'><div class='col-sm-3'>Reihe</div><div class='col-sm-3'>Sitz</div><div class='col-sm-3'>Nachname</div><div class='col-sm-3'>Vorname</div></div><br>";
+     foreach($conn->query($sql) as $row) {
+
+       echo "<div class='row'><div class='col-sm-3'>" . $row['rownr'] . "</div><div class='col-sm-3'>" . $row['seatposition'] . "</div><div class='col-sm-3'>" . $row['lastname'] . "</div><div class='col-sm-3'>" . $row['firstname'] . "</div></div>";
+     }
+   ?>
+   <br>
+   </div>
+
   </body>
 </html>
