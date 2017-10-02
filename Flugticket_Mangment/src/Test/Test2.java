@@ -49,6 +49,8 @@ public class Test2 {
 	//static ArrayList<Flughafen> flughafen= new ArrayList<Flughafen>();
     static ArrayList<String> länder;
     static ArrayList<String> städte;
+    static ArrayList<String> mehrlist;
+    static ArrayList<String> mehrlist2;
     static HashSet<String> land = new HashSet<String>();
     
 	static Hashtable<String, ArrayList> flughafen1 = new Hashtable<String, ArrayList>();
@@ -135,8 +137,16 @@ public class Test2 {
 		txtVorname = new JTextField();
 		txtVorname.setColumns(10);
 		
+		textField_2 = new JTextField();
+		textField_2.setColumns(10);
+		textField_2.setEditable(false);
+		
+		textField_3 = new JTextField();
+		textField_3.setColumns(10);
+		
 		txtNachname = new JTextField();
 		txtNachname.setColumns(10);
+		textField_3.setEditable(false);
 		
 		JComboBox comboBox = new JComboBox();
 		
@@ -228,7 +238,11 @@ public class Test2 {
 			public void keyPressed(KeyEvent e) {
 				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
 					String list = textField.getText();
-					list.substring(0, list.length()-1);
+					if(list.substring(list.length()).equals(" ")) {
+						list.substring(0, list.length()-1);
+					}
+					
+					textField_2.setEditable(true);
 					ArrayList s = flughafen1.get(list);
 					AutoSuggestor autoSuggestor3 = new AutoSuggestor(textField_2, frame, null, Color.WHITE.brighter(), Color.BLUE, Color.RED, 0.75f) {
 			            @Override
@@ -255,7 +269,11 @@ public class Test2 {
 			public void keyPressed(KeyEvent e) {
 				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
 					String list = textField.getText();
-					list.substring(0, list.length()-1);
+					if(list.substring(list.length()).equals(" ")) {
+						list.substring(0, list.length()-1);
+					}
+					
+					textField_3.setEditable(true);
 					ArrayList si = flughafen1.get(list);   
 			        AutoSuggestor autoSuggestor4 = new AutoSuggestor(textField_3, frame, null, Color.WHITE.brighter(), Color.BLUE, Color.RED, 0.75f) {
 			            @Override
@@ -273,11 +291,6 @@ public class Test2 {
 		});
 		textField_1.setColumns(10);
 		
-		textField_2 = new JTextField();
-		textField_2.setColumns(10);
-		
-		textField_3 = new JTextField();
-		textField_3.setColumns(10);
 		
         AutoSuggestor autoSuggestor = new AutoSuggestor(textField, frame, null, Color.WHITE.brighter(), Color.BLUE, Color.RED, 0.75f) {
             @Override
@@ -350,14 +363,48 @@ public class Test2 {
 			        try {
 			        	String one = "select airportcode from airports where name ='" +abflugs + "';";
 			        	ResultSet abflug1 = myStat.executeQuery(one);
+			        	int i =0;
+			        	boolean mehr = false;
 			        	while(abflug1.next()) {
 			        		one = abflug1.getString("airportcode");
+			        		i++;
+			        		if(i > 1) {
+			        			mehr =true;
+			        			break;
+			        		}
 			        	}
+			        	if(mehr == true) {
+			        		ResultSet abflugmehr = myStat.executeQuery("select airportcode from airports where name ='" +abflugs + "';");
+			        		mehrlist = new ArrayList<String>();
+				        	while(abflugmehr.next()) {
+				        		mehrlist.add(abflugmehr.getString("airportcode"));
+				        		
+				        	}
+				        	System.out.println(mehrlist.toString());
+			        	}
+			        	
 			        	myStat2 = myConn.createStatement();
 			        	String two = "select airportcode from airports where name ='" +ankunfts + "';";
 			        	ResultSet abflug2 = myStat2.executeQuery(two);
+			        	int ii =0;
+			        	boolean mehr2 = false;
 			        	while(abflug2.next()) {
 			        		two = abflug2.getString("airportcode");
+			        		ii++;
+			        		if(ii > 1) {
+			        			mehr2 =true;
+			        			break;
+			        		}
+			        	}
+			        	
+			        	if(mehr2 == true) {
+			        		ResultSet abflugmehr = myStat.executeQuery("select airportcode from airports where name ='" +abflugs + "';");
+			        		mehrlist2 = new ArrayList<String>();
+				        	while(abflugmehr.next()) {
+				        		mehrlist.add(abflugmehr.getString("airportcode"));
+				        		
+				        	}
+				        	System.out.println(mehrlist.toString());
 			        	}
 			        	
 			    		ResultSet myRs = myStat.executeQuery("select * from flights where departure_airport like '"+ one +"'AND  destination_airport like '" + two + "';" );
