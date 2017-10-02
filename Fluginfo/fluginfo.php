@@ -1,65 +1,23 @@
 <?php
-/*
-$counter = 0;
-$handle = fopen("connection.txt", "r");
-while(!feof($handle)){
-  $zeile = fgets($handle, 1000);
-  switch($counter){
-    case 0:
-    $servername = $zeile;
-    $counter++;
-    break;
-    case 1:
-    $db = $zeile;
-    $counter++;
-    break;
-    case 2:
-    $username = $zeile;
-    $counter++;
-    break;
-    case 3:
-    $password = $zeile;
-    $counter++;
-    break;
- }
-}
-fclose($handle);
-
-*/
-require("connect.php");
-
-
+//require("connect.php");
+$servername = $_POST['servername'];
+$db = $_POST['db'];
+$username = $_POST['username'];
+$password = $_POST['password'];
 try {
    $conn = new PDO("mysql:host=$servername;dbname=$db", $username, $password);
+   // set the PDO error mode to exception
    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
    }
 catch(PDOException $e)
    {
-     /*Hier gelangt der User hin, wenn die Verbindung mit der Datenbank nicht funktioniert hat.*/
-   $inhalt = "Connection failed: " . $e->getMessage();
-   $handle = fopen("errors.txt", "w");
-   fwrite ($handle, $inhalt);
-   fclose ($handle);
-
-   /*Zurückleiten zur Landingpage um die Daten nochmals einzugeben*/
-   //header ( 'Location: index.php' );
-
+   echo "Connection failed: " . $e->getMessage();
    }
-
-
 
    if (isset($_POST['loeschen'])) {
      if (!isset($_POST['m'])) {
-       /*Wenn der User keinen Passagier zum Löschen ausgewählt hat landet er hier.*/
        $meldung = 'Bitte markieren Sie den zu l&ouml;schenden Datensatz!' ;
-       $handle = fopen("errors.txt", "w");
-       fwrite ($handle, $meldung);
-       fclose ($handle);
      } else {
-       /*Hier wird die Error Datei wieder initialisiert, da es keinen Error gegeben hat.*/
-       $handle = fopen("errors.txt", "w");
-       fwrite ($handle, "");
-       fclose ($handle);
 
        // Markierten Datensatz l�schen
        $sql = 'DELETE FROM passengers WHERE id=' . $_POST['m'];
@@ -175,12 +133,7 @@ if(isset($_POST['flugnr'])){
  <form action="<?=$_SERVER['PHP_SELF']?>" method="post">
    <?php
      if(isset($flightnr)){
-
-       $handle = fopen("errors.txt", "r");
-       while( $error = fgets($handle, 4096)){
-         echo "<h5 style='color: red;'>" . $error . "</h5>";
-       }
-
+     if(isset($meldung)){echo $meldung;}
      $sql = "SELECT * FROM passengers WHERE flightnr = $flightnr ORDER BY 6,7";
      echo "<div class='row'><div class='col-sm-offset-1 col-sm-2'>Reihe</div><div class='col-sm-2'>Sitz</div><div class='col-sm-3'>Nachname</div><div class='col-sm-2'>Vorname</div></div><br>";
      foreach($conn->query($sql) as $row) {
