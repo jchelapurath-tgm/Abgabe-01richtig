@@ -23,6 +23,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Hashtable;
 
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.LineBorder;
@@ -38,48 +39,79 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import javax.swing.JList;
+import javax.swing.AbstractListModel;
+import javax.swing.JComboBox;
 
 public class Test2 {
 
-	static ArrayList<Flughafen> flughafen= new ArrayList<Flughafen>();
+	//static ArrayList<Flughafen> flughafen= new ArrayList<Flughafen>();
     static ArrayList<String> länder;
     static ArrayList<String> städte;
     static HashSet<String> land = new HashSet<String>();
-    static HashSet<String> stadt = new HashSet<String>();
+    
+	static Hashtable<String, ArrayList> flughafen1 = new Hashtable<String, ArrayList>();
+	
+	static boolean var = false;
 	
 	private JFrame frame;
 	private JTextField textField;
 	private JTextField textField_1;
 	private JScrollPane scrollPane;
 	private JTable table;
-
+	private JButton book = new JButton();
+	private JPanel panel = new JPanel();
+	
 	static Connection myConn;
 	static Statement myStat;
 	static Statement myStat2;
 	private JTextField textField_2;
 	private JTextField textField_3;
+	private JTextField txtVorname;
+	private JTextField txtNachname;
 	
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		String test = "SELECT airports.city, countries.name as 'land', airports.name, airports.country as 'kurz', airports.airportcode FROM airports INNER JOIN countries ON airports.country= countries.code;";
+		String test = "SELECT countries.name as 'land', airports.name, airports.country as 'kurz', airports.airportcode FROM airports INNER JOIN countries ON airports.country= countries.code;";
 		try {
 		myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/list_3ahit", "root", "Chelj20101999");
 		myStat = myConn.createStatement();
-		ResultSet myRs = myStat.executeQuery(test);
+		ResultSet myRs = myStat.executeQuery("Select name from countries;");
 		
 		while(myRs.next()){
-			flughafen.add(new Flughafen(myRs.getString("kurz"), myRs.getString("city"), myRs.getString("airportcode"), myRs.getString("name"),myRs.getString("land")));
+			land.add(myRs.getString("name"));
+			System.out.println(land.toString());
+			myStat = myConn.createStatement();
+			if(myRs.getString("name").equals("Cote D'Ivoire (Ivory Coast)")) {
+				/*ResultSet myRs1 = myStat.executeQuery("Select airports.name FROM airports INNER JOIN countries ON airports.country= countries.code where countries.name = Cote D'Ivoire (Ivory Coast);");
+				städte = new ArrayList<String>();
+				while(myRs1.next()) {
+					städte.add(myRs1.getString("name"));
+				}*/
+			}else {
+				ResultSet myRs1 = myStat.executeQuery("Select airports.name FROM airports INNER JOIN countries ON airports.country= countries.code where countries.name = '"+ myRs.getString("name")+"';");
+				städte = new ArrayList<String>();
+				while(myRs1.next()) {
+					System.out.println(myRs1.getString("name"));
+					städte.add(myRs1.getString("name"));
+				}
+			}
+	
+			flughafen1.put(myRs.getString("name"), städte);
+			System.out.println(flughafen1.get("Andorra").toString());
+			
+			
+			//airportcode.put(myRs.getString("name"),myRs.getString("airportcode"));
+			//flughafen1.put(myRs.getString("land"),airportcode.getKey());
+			
+			//flughafen.add(new Flughafen(myRs.getString("kurz"), myRs.getString("city"), myRs.getString("airportcode"), myRs.getString("name"),myRs.getString("land")));
 		}
-		for(int i = 0; i < flughafen.size();i++) {
-			//word.add(flughafen.get(i).getAirportcode());
-			stadt.add(flughafen.get(i).getStadt());			
-			land.add(flughafen.get(i).getFlullLand());
-		}
-		
+
 		länder = new ArrayList<String>(land);
-		städte = new ArrayList<String>(stadt);
+		System.out.println(flughafen1.get("Andorra").toString());
 		}catch(Exception e) {
 			System.out.println(e.toString());
 		}
@@ -100,6 +132,83 @@ public class Test2 {
 	 * Create the application.
 	 */
 	public Test2() {
+		txtVorname = new JTextField();
+		txtVorname.setColumns(10);
+		
+		txtNachname = new JTextField();
+		txtNachname.setColumns(10);
+		
+		JComboBox comboBox = new JComboBox();
+		
+		JComboBox comboBox_1 = new JComboBox();
+		
+		JLabel lblNewLabel_4 = new JLabel("Vorname");
+		
+		JLabel lblNewLabel_5 = new JLabel("Nachname");
+		
+		JLabel lblReihe = new JLabel("Reihe");
+		
+		JLabel lblSitzplatz = new JLabel("Sitzplatz");
+		
+		JButton btnBuchen = new JButton("Buchen");
+		GroupLayout gl_panel = new GroupLayout(panel);
+		gl_panel.setHorizontalGroup(
+			gl_panel.createParallelGroup(Alignment.TRAILING)
+				.addGroup(Alignment.LEADING, gl_panel.createSequentialGroup()
+					.addGap(72)
+					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
+						.addComponent(txtVorname, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblNewLabel_4, GroupLayout.PREFERRED_SIZE, 98, GroupLayout.PREFERRED_SIZE))
+					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel.createSequentialGroup()
+							.addGap(62)
+							.addComponent(txtNachname, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel.createSequentialGroup()
+							.addGap(91)
+							.addComponent(lblNewLabel_5)))
+					.addGap(46)
+					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING, false)
+						.addGroup(gl_panel.createSequentialGroup()
+							.addGap(1)
+							.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(lblReihe))
+					.addGap(45)
+					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+						.addComponent(lblSitzplatz)
+						.addComponent(comboBox_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap(110, Short.MAX_VALUE))
+				.addGroup(gl_panel.createSequentialGroup()
+					.addContainerGap(273, Short.MAX_VALUE)
+					.addComponent(btnBuchen, GroupLayout.PREFERRED_SIZE, 107, GroupLayout.PREFERRED_SIZE)
+					.addGap(267))
+		);
+		gl_panel.setVerticalGroup(
+			gl_panel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel.createSequentialGroup()
+					.addGap(48)
+					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
+						.addGroup(gl_panel.createSequentialGroup()
+							.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+								.addComponent(lblSitzplatz)
+								.addComponent(lblReihe))
+							.addGap(18)
+							.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+								.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(comboBox_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+						.addGroup(gl_panel.createSequentialGroup()
+							.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+								.addComponent(lblNewLabel_4, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblNewLabel_5))
+							.addGap(18)
+							.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+								.addComponent(txtVorname, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(txtNachname, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+					.addPreferredGap(ComponentPlacement.RELATED, 46, Short.MAX_VALUE)
+					.addComponent(btnBuchen, GroupLayout.PREFERRED_SIZE, 43, GroupLayout.PREFERRED_SIZE)
+					.addGap(24))
+		);
+		panel.setLayout(gl_panel);
+		panel.setVisible(false);
 		initialize();
 
 		}
@@ -110,16 +219,58 @@ public class Test2 {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 1013, 1081);
+		frame.setBounds(100, 100, 1013, 910);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		textField = new JTextField();
+		textField.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+					String list = textField.getText();
+					list.substring(0, list.length()-1);
+					ArrayList s = flughafen1.get(list);
+					AutoSuggestor autoSuggestor3 = new AutoSuggestor(textField_2, frame, null, Color.WHITE.brighter(), Color.BLUE, Color.RED, 0.75f) {
+			            @Override
+			            boolean wordTyped(String typedWord) {
+
+			            	
+			                setDictionary(s);
+			                //addToDictionary("bye");//adds a single word
+
+			                return super.wordTyped(typedWord);//now call super to check for any matches against newest dictionary
+			            }
+			        };
+				}
+			}
+		});
 		textField.setColumns(10);
 		
 		JLabel lblAbflug = new JLabel("Abflug");
 		lblAbflug.setFont(new Font("Tahoma", Font.PLAIN, 32));
 		
 		textField_1 = new JTextField();
+		textField_1.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+					String list = textField.getText();
+					list.substring(0, list.length()-1);
+					ArrayList si = flughafen1.get(list);   
+			        AutoSuggestor autoSuggestor4 = new AutoSuggestor(textField_3, frame, null, Color.WHITE.brighter(), Color.BLUE, Color.RED, 0.75f) {
+			            @Override
+			            boolean wordTyped(String typedWord) {
+
+
+			                setDictionary(si);
+			                //addToDictionary("bye");//adds a single word
+
+			                return super.wordTyped(typedWord);//now call super to check for any matches against newest dictionary
+			            }
+			        };
+				}
+			}
+		});
 		textField_1.setColumns(10);
 		
 		textField_2 = new JTextField();
@@ -140,29 +291,8 @@ public class Test2 {
             }
         };
         
-        AutoSuggestor autoSuggestor3 = new AutoSuggestor(textField_2, frame, null, Color.WHITE.brighter(), Color.BLUE, Color.RED, 0.75f) {
-            @Override
-            boolean wordTyped(String typedWord) {
-
-
-                setDictionary(städte);
-                //addToDictionary("bye");//adds a single word
-
-                return super.wordTyped(typedWord);//now call super to check for any matches against newest dictionary
-            }
-        };
         
-        AutoSuggestor autoSuggestor4 = new AutoSuggestor(textField_3, frame, null, Color.WHITE.brighter(), Color.BLUE, Color.RED, 0.75f) {
-            @Override
-            boolean wordTyped(String typedWord) {
-
-
-                setDictionary(städte);
-                //addToDictionary("bye");//adds a single word
-
-                return super.wordTyped(typedWord);//now call super to check for any matches against newest dictionary
-            }
-        };
+     
         AutoSuggestor autoSuggestor2 = new AutoSuggestor(textField_1, frame, null, Color.WHITE.brighter(), Color.BLUE, Color.RED, 0.75f) {
             @Override
             boolean wordTyped(String typedWord) {
@@ -174,6 +304,20 @@ public class Test2 {
                 return super.wordTyped(typedWord);//now call super to check for any matches against newest dictionary
             }
         };
+        table = new JTable();
+        
+		table.addMouseListener(new java.awt.event.MouseAdapter() {
+		    @Override
+		    public void mouseClicked(java.awt.event.MouseEvent evt) {
+		        int row = table.rowAtPoint(evt.getPoint());
+		        int col = table.columnAtPoint(evt.getPoint());
+		        if (row >= 0 && col >= 5) {
+		        	System.out.println("test");
+		        	panel.setVisible(true);
+		        }
+		    }
+		});
+		
 		
 		JLabel lblAnkunft = new JLabel("Ankunft");
 		lblAnkunft.setFont(new Font("Tahoma", Font.PLAIN, 32));
@@ -183,42 +327,40 @@ public class Test2 {
 			
 			// Hier wird nach zuständigen flügen gesucht
 			public void actionPerformed(ActionEvent arg0) {
-			      String abflugl = textField.getText();//.replaceAll("\\s","");
 			      String abflugs = textField_2.getText();//.replaceAll("\\s","");
-			      String ankunftl = textField_1.getText();//.replaceAll("\\s","");
 			      String ankunfts= textField_3.getText();//.replaceAll("\\s","");
-			     // System.out.println(abflug + "\n" + ankunft);
 			      
-					table = new JTable();
+					
 					table.setModel(new DefaultTableModel(
 						new Object[][] {
 						},
 						new String[] {
-							"airline", "flightnr", "deparute", "destination","planetype"
+							"airline", "flightnr", "deparute", "destination","planetype","Buchen"
 						}
 					));
 					table.getColumnModel().getColumn(0).setPreferredWidth(103);
 					table.getColumnModel().getColumn(1).setPreferredWidth(210);
 					table.getColumnModel().getColumn(2).setPreferredWidth(102);
 					table.getColumnModel().getColumn(3).setPreferredWidth(243);
+					table.getColumnModel().getColumn(4).setPreferredWidth(243);
 					scrollPane.setViewportView(table);
 			        DefaultTableModel model =  (DefaultTableModel)table.getModel();
-			        Object[] row = new Object[5];
+			        Object[] row = new Object[6];
 			        
 			        try {
-			        	String one = "select distinct airports.airportcode from airports Inner join countries on airports.country = countries.code where airports.city = \""+ abflugs +"\" And countries.name = \""+ abflugl + "\";";
+			        	String one = "select airportcode from airports where name ='" +abflugs + "';";
 			        	ResultSet abflug1 = myStat.executeQuery(one);
 			        	while(abflug1.next()) {
-			        		abflugl = abflug1.getString("airportcode");
+			        		one = abflug1.getString("airportcode");
 			        	}
 			        	myStat2 = myConn.createStatement();
-			        	String two = "select distinct airports.airportcode from airports Inner join countries on airports.country = countries.code where airports.city = \""+ ankunfts +"\" and countries.name = \""+ ankunftl + "\";";
+			        	String two = "select airportcode from airports where name ='" +ankunfts + "';";
 			        	ResultSet abflug2 = myStat2.executeQuery(two);
 			        	while(abflug2.next()) {
-			        		ankunftl = abflug2.getString("airportcode");
+			        		two = abflug2.getString("airportcode");
 			        	}
 			        	
-			    		ResultSet myRs = myStat.executeQuery("select * from flights where departure_airport like '"+ abflugl +"'AND  destination_airport like '" + ankunftl + "';" );
+			    		ResultSet myRs = myStat.executeQuery("select * from flights where departure_airport like '"+ one +"'AND  destination_airport like '" + two + "';" );
 			    		
 			    		while(myRs.next()){
 			    	           row[0] = myRs.getString("airline");
@@ -226,7 +368,7 @@ public class Test2 {
 			    	           row[2] = myRs.getDate("departure_time");
 			    	           row[3] = myRs.getDate("destination_time");
 			    	           row[4] = myRs.getInt("planetype");
-			    	 
+			    	           row[5] = "Buchen";
 			    	           model.addRow(row);
 			    		}
 		
@@ -236,6 +378,8 @@ public class Test2 {
 			      
 			}
 		});
+		
+
 		
 		scrollPane = new JScrollPane();
 		
@@ -249,10 +393,11 @@ public class Test2 {
 		
 		JLabel lblNewLabel_3 = new JLabel("Stadt");
 		
+
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.TRAILING)
-				.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
+			groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(groupLayout.createSequentialGroup()
 					.addGap(209)
 					.addComponent(lblAbflug, GroupLayout.PREFERRED_SIZE, 131, GroupLayout.PREFERRED_SIZE)
 					.addGap(335)
@@ -263,21 +408,6 @@ public class Test2 {
 					.addComponent(Suchenbutton, GroupLayout.PREFERRED_SIZE, 173, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap(412, Short.MAX_VALUE))
 				.addGroup(groupLayout.createSequentialGroup()
-					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-						.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
-							.addGap(52)
-							.addComponent(textField, GroupLayout.PREFERRED_SIZE, 206, GroupLayout.PREFERRED_SIZE)
-							.addGap(18)
-							.addComponent(textField_2, GroupLayout.PREFERRED_SIZE, 200, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED, 73, Short.MAX_VALUE)
-							.addComponent(textField_1, GroupLayout.PREFERRED_SIZE, 196, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(textField_3, GroupLayout.PREFERRED_SIZE, 170, GroupLayout.PREFERRED_SIZE))
-						.addGroup(groupLayout.createSequentialGroup()
-							.addContainerGap(114, Short.MAX_VALUE)
-							.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 813, GroupLayout.PREFERRED_SIZE)))
-					.addGap(68))
-				.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
 					.addGap(111)
 					.addComponent(lblNewLabel)
 					.addGap(204)
@@ -287,6 +417,24 @@ public class Test2 {
 					.addGap(193)
 					.addComponent(lblNewLabel_3)
 					.addGap(132))
+				.addGroup(groupLayout.createSequentialGroup()
+					.addGap(52)
+					.addComponent(textField, GroupLayout.PREFERRED_SIZE, 206, GroupLayout.PREFERRED_SIZE)
+					.addGap(18)
+					.addComponent(textField_2, GroupLayout.PREFERRED_SIZE, 200, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED, 73, Short.MAX_VALUE)
+					.addComponent(textField_1, GroupLayout.PREFERRED_SIZE, 196, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(textField_3, GroupLayout.PREFERRED_SIZE, 170, GroupLayout.PREFERRED_SIZE)
+					.addGap(68))
+				.addGroup(groupLayout.createSequentialGroup()
+					.addGap(86)
+					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 813, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(96, Short.MAX_VALUE))
+				.addGroup(groupLayout.createSequentialGroup()
+					.addGap(175)
+					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 647, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(173, Short.MAX_VALUE))
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
@@ -295,7 +443,7 @@ public class Test2 {
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
 						.addComponent(lblAnkunft, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 						.addComponent(lblAbflug, GroupLayout.DEFAULT_SIZE, 81, Short.MAX_VALUE))
-					.addPreferredGap(ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblNewLabel)
 						.addComponent(lblNewLabel_3)
@@ -310,10 +458,13 @@ public class Test2 {
 					.addGap(32)
 					.addComponent(Suchenbutton, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
 					.addGap(18)
-					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 624, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(38, Short.MAX_VALUE))
+					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 149, GroupLayout.PREFERRED_SIZE)
+					.addGap(40)
+					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 231, GroupLayout.PREFERRED_SIZE)
+					.addGap(246))
 		);
 		
+
 
 		frame.getContentPane().setLayout(groupLayout);
 	}
