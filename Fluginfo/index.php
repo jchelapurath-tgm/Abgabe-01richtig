@@ -1,31 +1,4 @@
 <?php
-/*
-$counter = 0;
-$handle = fopen("connection.txt", "r");
-while(!feof($handle)){
-  $zeile = fgets($handle, 1000);
-  switch($counter){
-    case 0:
-    $servername = $zeile;
-    $counter++;
-    break;
-    case 1:
-    $db = $zeile;
-    $counter++;
-    break;
-    case 2:
-    $username = $zeile;
-    $counter++;
-    break;
-    case 3:
-    $password = $zeile;
-    $counter++;
-    break;
- }
-}
-fclose($handle);
-
-*/
 require("connect.php");
 
 
@@ -168,7 +141,23 @@ if(isset($_POST['flugnr'])){
 <div class='container text-center'style='margin-top: 25px'>
  <div class='row text-center'>
    <div class='col-sm-12'>
-     <h2>Personen auf diesem Flug</h2>
+     <h2>Personen auf diesem Flug <?php
+     if( isset($flightnr)){
+       $sql = "SELECT maxseats FROM planes INNER JOIN flights ON planes.id = flights.planetype WHERE flights.flightnr = $flightnr";
+       foreach($conn->query($sql) as $row){
+         $gesamtAnzahl = $row['maxseats'];
+       }
+       $sql = "SELECT count(id) as 'Anzahl' FROM passengers WHERE flightnr = $flightnr";
+       foreach ($conn->query($sql) as $row) {
+         $personenAnzahl = $row['Anzahl'];
+       }
+       $freiePlätze = $gesamtAnzahl-$personenAnzahl;
+
+       if( isset($personenAnzahl)){
+         echo "(Gesamtplätze: " . $gesamtAnzahl . ") (Freie Plätze: " . $freiePlätze . ")";
+       }
+     }
+     ?></h2>
      <hr>
    </div>
  </div>
