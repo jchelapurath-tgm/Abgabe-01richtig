@@ -108,6 +108,7 @@ public class Test2 {
 				while(myRs1.next()) {
 					System.out.println(myRs1.getString("name"));
 					städte.add(myRs1.getString("name"));
+					
 				}
 			}
 	
