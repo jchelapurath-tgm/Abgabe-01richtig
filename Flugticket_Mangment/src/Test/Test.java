@@ -8,7 +8,7 @@ public class Test {
 	static ArrayList<Flughafen> flughafen= new ArrayList<Flughafen>();
 	
 	public static void main (String[] args) {
-		
+		//Commentar
 		try {
 			Connection myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/list_3ahit", "root", "Chelj20101999");
 
