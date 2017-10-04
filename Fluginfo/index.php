@@ -22,7 +22,7 @@ catch(PDOException $e)
 
 
    if (isset($_POST['loeschen'])) {
-     if (!isset($_POST['m'])) {
+     if (!isset($_POST['pid'])) {
        /*Wenn der User keinen Passagier zum Löschen ausgewählt hat landet er hier.*/
        $meldung = 'Bitte markieren Sie den zu l&ouml;schenden Datensatz!' ;
        $handle = fopen("errors.txt", "w");
@@ -35,7 +35,7 @@ catch(PDOException $e)
        fclose ($handle);
 
        // Markierten Datensatz l�schen
-       $sql = 'DELETE FROM passengers WHERE id=' . $_POST['m'];
+       $sql = 'DELETE FROM passengers WHERE id=' . $_POST['pid'];
        $conn->query($sql);
 
      }
@@ -174,7 +174,7 @@ if(isset($_POST['flugnr'])){
      echo "<div class='row'><div class='col-sm-offset-1 col-sm-2'>Reihe</div><div class='col-sm-2'>Sitz</div><div class='col-sm-3'>Nachname</div><div class='col-sm-2'>Vorname</div></div><br>";
      foreach($conn->query($sql) as $row) {
 
-       echo "<div class='row'><div class='col-sm-1'><input type='radio' name='m' value='" . $row['id'] . "'></div><div class='col-sm-2'>" . $row['rownr'] . "</div><div class='col-sm-2'>" . $row['seatposition'] . "</div><div class='col-sm-3'>" . $row['lastname'] . "</div><div class='col-sm-2'>" . $row['firstname'] . "</div><div class='col-sm-2'><input type='submit' id='" . $flightnr . "' name='loeschen' value='L&ouml;schen'></div></div>";
+       echo "<div class='row'><div class='col-sm-1'><input type='radio' name='pid' value='" . $row['id'] . "'></div><div class='col-sm-2'>" . $row['rownr'] . "</div><div class='col-sm-2'>" . $row['seatposition'] . "</div><div class='col-sm-3'>" . $row['lastname'] . "</div><div class='col-sm-2'>" . $row['firstname'] . "</div><div class='col-sm-2'><input type='submit' id='" . $flightnr . "' name='loeschen' value='L&ouml;schen'></div></div>";
      }
    }
    ?>
