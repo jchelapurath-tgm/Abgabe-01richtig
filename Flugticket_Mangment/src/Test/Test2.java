@@ -20,6 +20,7 @@ import java.awt.Window;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -41,7 +42,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.AbstractListModel;
+import javax.swing.ComboBoxEditor;
 import javax.swing.JComboBox;
 
 public class Test2 {
@@ -64,10 +67,16 @@ public class Test2 {
 	private JTable table;
 	private JButton book = new JButton();
 	private JPanel panel = new JPanel();
+	int maxrow = 0;
+	
+	JComboBox comboBox = new JComboBox();
+	
+	JComboBox comboBox_1 = new JComboBox();
 	
 	static Connection myConn;
 	static Statement myStat;
 	static Statement myStat2;
+	static Statement myStat3;
 	private JTextField textField_2;
 	private JTextField textField_3;
 	private JTextField txtVorname;
@@ -147,10 +156,7 @@ public class Test2 {
 		txtNachname = new JTextField();
 		txtNachname.setColumns(10);
 		textField_3.setEditable(false);
-		
-		JComboBox comboBox = new JComboBox();
-		
-		JComboBox comboBox_1 = new JComboBox();
+
 		
 		JLabel lblNewLabel_4 = new JLabel("Vorname");
 		
@@ -161,6 +167,27 @@ public class Test2 {
 		JLabel lblSitzplatz = new JLabel("Sitzplatz");
 		
 		JButton btnBuchen = new JButton("Buchen");
+		btnBuchen.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				String vorname = txtVorname.getText();
+				String nachname = txtNachname.getText();
+				int flightnr =  (int) table.getModel().getValueAt(0, 1);
+				String airline = (String) table.getModel().getValueAt(0, 0);
+				String row = (String) comboBox.getSelectedItem();
+				String seat = (String) comboBox_1.getSelectedItem();
+				
+				try {
+					myStat3 = myConn.createStatement();
+					myStat3.executeUpdate("INSERT INTO passengers VALUES(NULL,'"+vorname+"','"+nachname+"','"+airline+"','"+flightnr+"','"+seat+"','"+row+"');");
+				} catch (SQLException en) {
+					en.printStackTrace();
+				}
+			}
+		});
+	
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.TRAILING)
@@ -241,7 +268,7 @@ public class Test2 {
 					if(list.substring(list.length()).equals(" ")) {
 						list.substring(0, list.length()-1);
 					}
-					
+					if(flughafen1.containsKey(list)) {
 					textField_2.setEditable(true);
 					ArrayList s = flughafen1.get(list);
 					AutoSuggestor autoSuggestor3 = new AutoSuggestor(textField_2, frame, null, Color.WHITE.brighter(), Color.BLUE, Color.RED, 0.75f) {
@@ -255,6 +282,12 @@ public class Test2 {
 			                return super.wordTyped(typedWord);//now call super to check for any matches against newest dictionary
 			            }
 			        };
+					}else {
+						JOptionPane.showMessageDialog(frame,
+							"Land exsistiert nicht",
+							    "Land nicht gefunden",
+							    JOptionPane.ERROR_MESSAGE);
+					}
 				}
 			}
 		});
@@ -272,7 +305,8 @@ public class Test2 {
 					if(list.substring(list.length()).equals(" ")) {
 						list.substring(0, list.length()-1);
 					}
-					
+					if(flughafen1.containsKey(list)) {
+						
 					textField_3.setEditable(true);
 					ArrayList si = flughafen1.get(list);   
 			        AutoSuggestor autoSuggestor4 = new AutoSuggestor(textField_3, frame, null, Color.WHITE.brighter(), Color.BLUE, Color.RED, 0.75f) {
@@ -286,6 +320,13 @@ public class Test2 {
 			                return super.wordTyped(typedWord);//now call super to check for any matches against newest dictionary
 			            }
 			        };
+					}else {
+						JOptionPane.showMessageDialog(frame,
+								"Land exsistiert nicht",
+								    "Land nicht gefunden",
+								    JOptionPane.ERROR_MESSAGE);
+					
+					}
 				}
 			}
 		});
@@ -327,6 +368,33 @@ public class Test2 {
 		        if (row >= 0 && col >= 5) {
 		        	System.out.println("test");
 		        	panel.setVisible(true);
+		        	
+					try {
+						myStat3 = myConn.createStatement();
+						ResultSet rs = myStat3.executeQuery("select planes.maxseats,planes.seatsperrow from planes,flights WHERE flights.planetype = planes.id AND flights.flightnr ='"+table.getModel().getValueAt(0, 1) +"' AND flights.airline ='"+table.getModel().getValueAt(0, 0)+"';");
+						
+						while (rs.next()) {
+							maxrow = rs.getInt("maxseats") / rs.getInt("seatsperrow");
+						}
+						
+						String[] seat = {"A","B","C","D","E","F","G"};
+						ArrayList<Integer> rows = new ArrayList<Integer>();
+						for(int i=0;i<seat.length;i++) {
+							comboBox.addItem(seat[i]);
+						}
+						
+						for(int i=1;i<=maxrow;i++) {
+							rows.add(i);
+						}
+						
+						Integer[] rowArr = rows.toArray(new Integer[rows.size()]);
+						
+						for (Integer nr:rowArr) {
+							comboBox_1.addItem(nr.toString());
+						}
+						
+					} catch (SQLException e) {
+					}
 		        }
 		    }
 		});
@@ -342,7 +410,14 @@ public class Test2 {
 			public void actionPerformed(ActionEvent arg0) {
 			      String abflugs = textField_2.getText();//.replaceAll("\\s","");
 			      String ankunfts= textField_3.getText();//.replaceAll("\\s","");
+			    
+			      if(abflugs.substring(abflugs.length()).equals(" ")){
+							abflugs.substring(0, abflugs.length()-1);
+		}
 			      
+			      if(ankunfts.substring(ankunfts.length()).equals(" ")){
+							ankunfts.substring(0, ankunfts.length()-1);
+		}
 					
 					table.setModel(new DefaultTableModel(
 						new Object[][] {
@@ -420,6 +495,9 @@ public class Test2 {
 			    		}
 		
 			    		}catch(Exception e) {
+			    			JOptionPane.showMessageDialog(frame,
+			    				    "Keine Flüge gefunden");
+			    			frame.repaint();
 			    			System.out.println(e.toString());
 			    		}
 			      
